@@ -132,7 +132,7 @@
 
 <div id="startScreen" class="overlay">
   <div class="card">
-    <div class="emoji">🐰</div>
+    <div class="emoji">🥕</div>
     <h1>무한 달리기</h1>
     <p class="sub">
       장애물을 뛰어넘으며 끝없이 달려요!<br>
@@ -517,29 +517,42 @@
     // 그림자
     ctx.fillStyle = 'rgba(107,74,100,0.15)';
     ctx.beginPath(); ctx.ellipse(0, GROUND - by + bob + 2, w * 0.45, 5, 0, 0, Math.PI * 2); ctx.fill();
-    // 발
-    ctx.fillStyle = '#ffd0dc';
+    // 발 (달릴 때 번갈아 움직임)
+    ctx.fillStyle = '#e07a3a';
     const legA = player.onGround ? Math.sin(runPhase * 2) * 6 : 4;
-    ctx.beginPath(); ctx.ellipse(-8 + legA, 0, 7, 4, 0, 0, Math.PI * 2); ctx.fill();
-    ctx.beginPath(); ctx.ellipse(8 - legA, 0, 7, 4, 0, 0, Math.PI * 2); ctx.fill();
-    // 귀
-    ctx.fillStyle = '#ffffff'; ctx.strokeStyle = '#f3c4d4'; ctx.lineWidth = 2;
-    const earTilt = player.onGround ? Math.sin(runPhase) * 0.12 : -0.35;
-    for (const s of [-1, 1]) {
+    ctx.beginPath(); ctx.ellipse(-7 + legA, 0, 6, 3.5, 0, 0, Math.PI * 2); ctx.fill();
+    ctx.beginPath(); ctx.ellipse(7 - legA, 0, 6, 3.5, 0, 0, Math.PI * 2); ctx.fill();
+    // 잎 (달리면 살랑살랑, 점프하면 뒤로 젖혀짐)
+    const leafTilt = player.onGround ? Math.sin(runPhase) * 0.15 : -0.4;
+    ctx.strokeStyle = '#4fb37f'; ctx.lineWidth = 2;
+    for (const [ang, len, col] of [[-0.55, 15, '#7fd6a0'], [0.55, 15, '#7fd6a0'], [0, 20, '#6cca93']]) {
       ctx.save();
-      ctx.translate(s * bw * 0.22, -bh + 4);
-      ctx.rotate(s * 0.12 + earTilt);
-      ctx.beginPath(); ctx.ellipse(0, -14, 6, 15, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
-      ctx.fillStyle = '#ffc2d6';
-      ctx.beginPath(); ctx.ellipse(0, -14, 3, 10, 0, 0, Math.PI * 2); ctx.fill();
-      ctx.fillStyle = '#ffffff';
+      ctx.translate(0, -bh + 3);
+      ctx.rotate(ang + leafTilt);
+      ctx.fillStyle = col;
+      ctx.beginPath(); ctx.ellipse(0, -len / 2, 5, len / 2 + 2, 0, 0, Math.PI * 2); ctx.fill(); ctx.stroke();
       ctx.restore();
     }
-    // 몸
-    roundRect(-bw / 2, -bh, bw, bh, Math.min(bw, bh) * 0.48);
-    ctx.fillStyle = '#ffffff'; ctx.fill();
-    ctx.strokeStyle = '#f3c4d4'; ctx.lineWidth = 2.5; ctx.stroke();
-    face(5, -bh * 0.58, 3, state !== 'over');
+    // 몸 (위는 둥글고 아래로 갈수록 뾰족한 당근 모양)
+    const top = -bh, half = bw / 2;
+    ctx.beginPath();
+    ctx.moveTo(-half, top + 10);
+    ctx.quadraticCurveTo(-half, top, -half + 10, top);
+    ctx.lineTo(half - 10, top);
+    ctx.quadraticCurveTo(half, top, half, top + 10);
+    ctx.quadraticCurveTo(half - 2, -10, 3, -1);
+    ctx.quadraticCurveTo(0, 1, -3, -1);
+    ctx.quadraticCurveTo(-half + 2, -10, -half, top + 10);
+    ctx.closePath();
+    ctx.fillStyle = '#ffa45c'; ctx.fill();
+    ctx.strokeStyle = '#e07a3a'; ctx.lineWidth = 2.5; ctx.stroke();
+    // 당근 줄무늬
+    ctx.strokeStyle = 'rgba(224,122,58,0.7)'; ctx.lineWidth = 1.6; ctx.lineCap = 'round';
+    ctx.beginPath();
+    ctx.moveTo(-half + 5, top + bh * 0.62); ctx.lineTo(-half + 12, top + bh * 0.62);
+    ctx.moveTo(half - 13, top + bh * 0.76); ctx.lineTo(half - 7, top + bh * 0.76);
+    ctx.stroke();
+    face(4, top + bh * 0.36, 3, state !== 'over');
     ctx.restore();
   }
 
